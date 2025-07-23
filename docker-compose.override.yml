@@ -1,0 +1,17 @@
+version: '3.8'
+
+# This override file is used when running the test product standalone
+# It creates a local network instead of trying to connect to the incident_agent network
+
+services:
+  test-product:
+    networks:
+      - test-product-network
+    # Override the network settings from the main docker-compose.yml
+
+networks:
+  test-product-network:
+    driver: bridge
+  default:
+    name: test-product-network
+    external: false

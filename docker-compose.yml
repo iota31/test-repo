@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  test-product:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: incident-agent/test-product:latest
+    ports:
+      - "8000:8000"  # API port
+    volumes:
+      - ./logs:/app/logs  # Mount logs directory for access from host
+    environment:
+      - TZ=UTC
+      - TEST_PRODUCT_LOG_FILE=/app/logs/test_product.log
+      - TEST_PRODUCT_LOG_LEVEL=INFO
+      - TEST_PRODUCT_ERROR_RATE=0.05
+      - TEST_PRODUCT_WARNING_RATE=0.15
+      - TEST_PRODUCT_CRITICAL_RATE=0.01
+      - TEST_PRODUCT_INTERVAL=2.0
+      - TEST_PRODUCT_SERVICES=UserService,PaymentService,DataProcessingService,AuthService
+      - TEST_PRODUCT_PORT=8000
+      - TEST_PRODUCT_HOST=0.0.0.0
+      - TEST_PRODUCT_DEBUG=true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+networks:
+  default:
+    name: incident_agent_incident-agent-network
+    external: true
